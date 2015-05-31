@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+  </head>
+  <body ng-app="starter">
+
+    <ion-pane ng-controller="MetronomeController">
+     
+      <ion-content class="text-center">
+
+        <ion-slide-box on-slide-changed="slideHasChanged($index)">
+          <ion-slide ng-repeat="phraseConfig in phraseConfigs track by $index">
+
+            <div class="row" >
+              <div class="col col-center col-25 col-offset-75" s>
+                <div class="button-bar">
+                  <button class="button button-clear"><i class="icon ion-volume-mute"></i> </button>
+                  <button class="button button-clear" ng-click="deletePhrase($index)"><i class="icon ion-trash-a"></i> </button>
+                </div>
+              </div>
+
+            </div>
+            <div class="row" >
+              
+              <div class="col col-center col-25" s>
+                <button class="button button-light"> <i class="icon ion-minus-round"></i> </button>
+              </div>
+              <div class="col col-center col-50 text-center" >
+                  BPM <h2>{{phraseConfig.bpm}}</h2>
+              </div>
+              <div class="col col-center col-25" s>
+                <button class="button button-light"> <i class="icon ion-plus-round"></i> </button>
+              </div>
+            </div>
+            <div class="row" >
+              <div class="col col-center col-25" s>
+                <button class="button button-light"> <i class="icon ion-minus-round"></i> </button>
+              </div>
+              <div class="col col-center col-50 text-center" >
+                  BPB <h2>{{phraseConfig.bpb}}</h2>
+              </div>
+              <div class="col col-center col-25" s>
+                <button class="button button-light"> <i class="icon ion-plus-round"></i> </button>
+              </div>
+            </div>
+            <div class="row" style="margin-bottom:20px;">
+              <div class="col col-center col-25" s>
+                <button class="button button-light"> <i class="icon ion-minus-round"></i> </button>
+              </div>
+              <div class="col col-center col-50 text-center" >
+                  Bars <h2>{{phraseConfig.bars}}</h2>
+              </div>
+              <div class="col col-center col-25" s>
+                <button class="button button-light"> <i class="icon ion-plus-round"></i> </button>
+              </div>
+            </div>
+        </ion-slide>
+       
+      </ion-slide-box>
+        
+      <hr>
+
+      <div class="row" >
+        <div class="col col-center col-25 col-offset-75" s>
+          <div class="button-bar">
+            <button class="button button-clear" ng-click="addPhrase()"><i class="icon ion-plus-circled"></i> </button>
+            <button class="button button-clear"><i class="icon ion-locked"></i> </button>
+          </div>
+        </div>
+
+      </div>
+
+       
+      </ion-content>
+      <div class="bar bar-footer">
+        <div class="button-bar">
+          <button class="button button-clear button-positive"><i class="icon ion-play"></i></button>
+          <button class="button button-clear button-positive"><i = class="icon ion-pause"></i></button>
+        </div>
+      </div>
+    </ion-pane>
+  </body>
+</html>
