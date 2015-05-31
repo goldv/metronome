@@ -3,12 +3,71 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    var context = new AudioContext();
+    var buffer
+
+    var loader = new AudioSampleLoader();
+    loader.src = 'audio/Classic.mp3'
+    loader.ctx = context
+    loader.onload = function(){
+      var source1 = context.createBufferSource();
+      buffer = loader.response
+      source1.connect(context.destination);
+      //source1.start(0);
+    }
+
+    loader.send()
+
 angular.module('starter', ['ionic'])
 
 .controller('MetronomeController', ['Metronome', '$scope','$ionicSlideBoxDelegate','$timeout', function(Metronome, $scope, $ionicSlideBoxDelegate, $timeout){
 
   $scope.phraseConfigs = Metronome.getConfigs()
   $scope.sync = false
+  $scope.running = false
+
+  var RhythmSample = {
+  };
+
+  RhythmSample.play = function() {
+    function playSound(buffer, time) {
+      var source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      if (!source.start)
+        source.start = source.noteOn;
+      var started = source.start(time);
+    }
+
+    
+    // We'll start playing the rhythm 100 milliseconds from "now"
+    var startTime = context.currentTime + 0.100;
+    var tempo = 80; // BPM (beats per minute)
+    var eighthNoteTime = (60 / tempo) / 2;
+
+    // Play 2 bars of the following:
+    for (var bar = 0; bar < 2; bar++) {
+      console.log("starting")
+      var time = startTime + bar * 8 * eighthNoteTime;
+      // Play the bass (kick) drum on beats 1, 5
+      playSound(buffer, time);
+      playSound(buffer, time + 4 * eighthNoteTime);
+
+      // Play the snare drum on beats 3, 7
+      playSound(buffer, time + 2 * eighthNoteTime);
+      playSound(buffer, time + 6 * eighthNoteTime);
+
+      // Play the hi-hat every eighthh note.
+      for (var i = 0; i < 8; ++i) {
+        playSound(buffer, time + i * eighthNoteTime);
+      }
+    }
+  };
+
+  $scope.play = function(){
+    RhythmSample.play()
+  }
 
   $scope.$watchCollection('phraseConfigs', function(){
     //var currentIdx = $ionicSlideBoxDelegate.currentIndex()
@@ -17,18 +76,34 @@ angular.module('starter', ['ionic'])
     $timeout(function(){
       $ionicSlideBoxDelegate.update()
     },0)
-    
+  })
+
+  $scope.$on("metronome-beat", function(event, data){
+    console.log("beat")
+  })
+
+  $scope.$on("metronome-status", function(event, data){
+    $scope.running = data.running
   })
 
   $scope.addPhrase = function(){
     Metronome.addConfig($scope.sync)
-    
   }
 
   $scope.deletePhrase = function(index){
-    
-    
     Metronome.deleteConfig(index)
+  }
+
+  $scope.toggle = function(){
+    if(!$scope.running){
+      Metronome.start()  
+    } else {
+      Metronome.stop()
+    }
+  }
+
+  $scope.stop = function(){
+    Metronome.stop()
   }
 
 }])
@@ -44,7 +119,7 @@ angular.module('starter', ['ionic'])
  
   var phrases = [ defaultConfig ]
   var currentPhraseIdx = 0;
-  var currentInterval 
+  var currentInterval, isRunning 
   var currentPhrase = initPhrase();
  
   function handleIntervalUpdate(){
@@ -96,6 +171,11 @@ angular.module('starter', ['ionic'])
     var config = phrases[currentPhraseIdx]
     $rootScope.$broadcast("metronome-beat",{ config : config, phrase: angular.copy(currentPhrase) })
   }
+
+  function publishStatus(running){
+    isRunning = running
+    $rootScope.$broadcast("metronome-status",{ running : running }) 
+  }
  
   function syncConfig(idx){
     var config = phrases[idx]
@@ -108,15 +188,36 @@ angular.module('starter', ['ionic'])
       }
     }    
   }
+
+  function loadAudio(){
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    var context = new AudioContext();
+
+    var loader = new AudioSampleLoader();
+    loader.src = 'audio/Classic.mp3'
+    loader.ctx = context
+    loader.onload = function(){
+      var source1 = context.createBufferSource();
+      source1.buffer = loader.response
+      source1.connect(context.destination);
+      //source1.start(0);
+    }
+
+    loader.send()
+  }
  
   return {
     start : function(){
-      currentInterval = $timeout(handleIntervalUpdate,0)      
+      if(!isRunning){
+        currentInterval = $timeout(handleIntervalUpdate,0)
+        publishStatus(true)        
+      }
     },
     stop : function(){
       $timeout.cancel(currentInterval)
       currentPhrase = initPhrase()
       tick();  
+      publishStatus(false)
     },
     getConfigs : function(){
       return phrases;
@@ -152,5 +253,8 @@ angular.module('starter', ['ionic'])
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
+
+
+  
   });
 })

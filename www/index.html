@@ -19,6 +19,7 @@
     <script src="cordova.js"></script>
 
     <!-- your app's js -->
+    <script src="js/AudioSampleLoader.js"></script>
     <script src="js/app.js"></script>
   </head>
   <body ng-app="starter">
@@ -34,7 +35,7 @@
               <div class="col col-center col-25 col-offset-75" s>
                 <div class="button-bar">
                   <button class="button button-clear"><i class="icon ion-volume-mute"></i> </button>
-                  <button class="button button-clear" ng-click="deletePhrase($index)"><i class="icon ion-trash-a"></i> </button>
+                  <button class="button button-clear" ng-if="!$first" ng-click="deletePhrase($index)"><i class="icon ion-trash-a"></i> </button>
                 </div>
               </div>
 
@@ -70,7 +71,7 @@
                   Bars <h2>{{phraseConfig.bars}}</h2>
               </div>
               <div class="col col-center col-25" s>
-                <button class="button button-light"> <i class="icon ion-plus-round"></i> </button>
+                <button class="button button-light" ng-click="play()"> <i class="icon ion-plus-round"></i> </button>
               </div>
             </div>
         </ion-slide>
@@ -79,8 +80,8 @@
         
       <hr>
 
-      <div class="row" >
-        <div class="col col-center col-25 col-offset-75" s>
+      <div class="row " >
+        <div class="col col-center col-25 col-offset-75" >
           <div class="button-bar">
             <button class="button button-clear" ng-click="addPhrase()"><i class="icon ion-plus-circled"></i> </button>
             <button class="button button-clear"><i class="icon ion-locked"></i> </button>
@@ -89,12 +90,16 @@
 
       </div>
 
+      
        
       </ion-content>
       <div class="bar bar-footer">
         <div class="button-bar">
-          <button class="button button-clear button-positive"><i class="icon ion-play"></i></button>
-          <button class="button button-clear button-positive"><i = class="icon ion-pause"></i></button>
+          <button class="button button-clear button-positive" ng-click="toggle()">
+            <i class="icon ion-play" ng-if="!running" ></i> 
+            <i class="icon ion-stop" ng-if="running" ></i> 
+          </button>
+          <button class="button button-clear button-positive" ng-click="stop()"><i = class="icon ion-pause"></i></button>
         </div>
       </div>
     </ion-pane>
